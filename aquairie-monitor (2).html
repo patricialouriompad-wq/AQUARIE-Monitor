@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AQUAIRIE Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<style>
+/* ===== CSS VARIABLES ===== */
+:root {
+  --green-dark: #1a5c2e;
+  --green-mid: #2d8a4e;
+  --green-light: #4caf70;
+  --green-pale: #e8f5ed;
+  --blue-dark: #0d4f7a;
+  --blue-mid: #1a7abf;
+  --blue-light: #4ba3d8;
+  --blue-pale: #e4f3fb;
+  --water: #87ceeb;
+  --white: #ffffff;
+  --off-white: #f7fbf9;
+  --gray-100: #f0f4f2;
+  --gray-200: #dde8e2;
+  --gray-400: #8faa99;
+  --gray-600: #556b5e;
+  --gray-800: #2c3a32;
+  --yellow: #f0a500;
+  --yellow-pale: #fff8e1;
+  --red: #d93025;
+  --red-pale: #fdecea;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(26,92,46,0.08);
+  --shadow-hover: 0 8px 32px rgba(26,92,46,0.16);
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --transition: 0.25s ease;
+}
+
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--off-white);
+  color: var(--gray-800);
+  line-height: 1.6;
+}
+img { max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: var(--font-body); }
+input, select, textarea { font-family: var(--font-body); }
+ul { list-style: none; }
+
+/* ===== NAVIGATION ===== */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  box-shadow: 0 2px 12px rgba(26,92,46,0.06);
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--green-dark);
+}
+.nav-brand .drop-icon { font-size: 1.4rem; }
+.nav-links {
+  display: flex;
+  gap: 0.2rem;
+  align-items: center;
+}
+.nav-links a {
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  transition: var(--transition);
+}
+.nav-links a:hover, .nav-links a.active {
+  background: var(--green-pale);
+  color: var(--green-dark);
+}
+.nav-cta {
+  background: var(--green-mid) !important;
+  color: var(--white) !important;
+  padding: 0.45rem 1rem !important;
+}
+.nav-cta:hover { background: var(--green-dark) !important; }
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--green-dark);
+}
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 64px; left: 0; right: 0;
+  background: white;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+  z-index: 999;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.mobile-menu a {
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  color: var(--gray-600);
+  display: block;
+}
+.mobile-menu a:hover { background: var(--green-pale); color: var(--green-dark); }
+
+/* ===== PAGE SYSTEM ===== */
+.page { display: none; animation: fadeIn 0.4s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+/* ===== HERO ===== */
+.hero {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--green-pale) 0%, var(--blue-pale) 60%, #fff 100%);
+}
+.hero-waves {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  overflow: hidden;
+  line-height: 0;
+}
+.hero-waves svg { display: block; }
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  border: 1px solid var(--green-light);
+  color: var(--green-mid);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(45,138,78,0.1);
+}
+.hero h1 {
+  font-family: var(--font-head);
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--green-dark);
+  margin-bottom: 0.5rem;
+}
+.hero h1 span { color: var(--blue-mid); }
+.hero-tagline {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  color: var(--gray-600);
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+.hero-desc {
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+  color: var(--gray-600);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.hero-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.8rem;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  transition: var(--transition);
+}
+.btn-primary {
+  background: var(--green-mid);
+  color: white;
+  box-shadow: 0 4px 16px rgba(45,138,78,0.3);
+}
+.btn-primary:hover { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(45,138,78,0.4); }
+.btn-secondary {
+  background: white;
+  color: var(--green-dark);
+  border: 2px solid var(--green-light);
+}
+.btn-secondary:hover { background: var(--green-pale); transform: translateY(-2px); }
+.btn-blue {
+  background: var(--blue-mid);
+  color: white;
+}
+.btn-blue:hover { background: var(--blue-dark); }
+.btn-sm { padding: 0.5rem 1.1rem; font-size: 0.82rem; }
+.btn-outline {
+  background: transparent;
+  color: var(--green-mid);
+  border: 2px solid var(--green-light);
+}
+.btn-outline:hover { background: var(--green-pale); }
+
+.hero-stats {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  margin-top: 3.5rem;
+  flex-wrap: wrap;
+}
+.hero-stat { text-align: center; }
+.hero-stat .num {
+  font-family: var(--font-head);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--green-mid);
+  display: block;
+}
+.hero-stat .lbl { font-size: 0.78rem; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* ===== SECTION WRAPPER ===== */
+.section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+.section-sm { padding: 2rem 2rem; max-width: 1100px; margin: 0 auto; }
+.section-title {
+  font-family: var(--font-head);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  color: var(--green-dark);
+  margin-bottom: 0.5rem;
+}
+.section-subtitle { color: var(--gray-400); font-size: 0.9rem; margin-bottom: 2.5rem; }
+.divider {
+  width: 48px; height: 4px;
+  background: linear-gradient(90deg, var(--green-mid), var(--blue-mid));
+  border-radius: 2px;
+  margin: 0.6rem 0 2rem;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--gray-200);
+  transition: var(--transition);
+}
+.card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; }
+
+/* ===== FORM ===== */
+.form-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 2.5rem;
+  box-shadow: var(--shadow);
+  max-width: 640px;
+  margin: 0 auto;
+  border: 1px solid var(--gray-200);
+}
+.form-group { margin-bottom: 1.3rem; }
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 0.45rem;
+}
+.form-group label .req { color: var(--red); margin-left: 2px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  padding: 0.72rem 1rem;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  color: var(--gray-800);
+  background: var(--off-white);
+  transition: var(--transition);
+  outline: none;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--green-light);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(76,175,112,0.12);
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-hint { font-size: 0.76rem; color: var(--gray-400); margin-top: 0.3rem; }
+.form-divider { border: none; border-top: 1px solid var(--gray-200); margin: 1.5rem 0; }
+.form-btn { width: 100%; padding: 0.9rem; font-size: 1rem; }
+
+/* ===== PROGRESS BAR ===== */
+.progress-wrap { margin: 0.5rem 0 1rem; }
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--gray-600);
+}
+.progress-track {
+  height: 10px;
+  background: var(--gray-100);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 1s ease;
+}
+.bar-green { background: linear-gradient(90deg, var(--green-mid), var(--green-light)); }
+.bar-yellow { background: linear-gradient(90deg, #e67e00, var(--yellow)); }
+.bar-red { background: linear-gradient(90deg, #b71c1c, var(--red)); }
+
+/* ===== STATUS BADGE ===== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 100px;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+.badge-green { background: var(--green-pale); color: var(--green-dark); }
+.badge-yellow { background: var(--yellow-pale); color: #7a4800; }
+.badge-red { background: var(--red-pale); color: var(--red); }
+
+/* ===== DASHBOARD HEADER ===== */
+.dash-header {
+  background: linear-gradient(135deg, var(--green-dark) 0%, var(--blue-dark) 100%);
+  color: white;
+  padding: 3rem 2rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.dash-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+}
+.dash-header h2 {
+  font-family: var(--font-head);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  position: relative;
+}
+.dash-header p { opacity: 0.8; margin-top: 0.4rem; font-size: 0.9rem; position: relative; }
+.dash-greeting { font-size: 0.85rem; opacity: 0.7; margin-bottom: 0.3rem; position: relative; }
+
+/* ===== FILTER CARDS ===== */
+.filter-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--gray-200);
+  transition: var(--transition);
+}
+.filter-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.filter-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 0.8rem;
+}
+.icon-gravel { background: #f3ede3; }
+.icon-sand { background: #fdf3d0; }
+.icon-biochar { background: #e8ebe4; }
+.icon-cotton { background: #eff3ff; }
+.filter-card h3 {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-bottom: 0.25rem;
+}
+.filter-card .filter-sub { font-size: 0.78rem; color: var(--gray-400); margin-bottom: 0.8rem; }
+.filter-meta { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.8rem; }
+.filter-meta-row {
+  display: flex; justify-content: space-between;
+  font-size: 0.8rem; color: var(--gray-600);
+}
+.filter-meta-row span:last-child { font-weight: 600; color: var(--gray-800); }
+
+/* ===== NOTIFICATION ===== */
+.notif {
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.88rem;
+  border-left: 4px solid;
+}
+.notif-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 0.05rem; }
+.notif-body { flex: 1; }
+.notif-body strong { display: block; font-weight: 600; margin-bottom: 0.15rem; }
+.notif-green { background: var(--green-pale); border-color: var(--green-mid); color: var(--green-dark); }
+.notif-yellow { background: var(--yellow-pale); border-color: var(--yellow); color: #7a4800; }
+.notif-red { background: var(--red-pale); border-color: var(--red); color: var(--red); }
+
+/* ===== TABLE ===== */
+.table-wrap { overflow-x: auto; border-radius: var(--radius); box-shadow: var(--shadow); }
+table { width: 100%; border-collapse: collapse; background: white; font-size: 0.88rem; }
+thead { background: var(--green-dark); color: white; }
+thead th { padding: 0.85rem 1rem; text-align: left; font-weight: 600; font-size: 0.82rem; letter-spacing: 0.04em; text-transform: uppercase; }
+tbody tr { border-bottom: 1px solid var(--gray-100); transition: var(--transition); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--green-pale); }
+tbody td { padding: 0.85rem 1rem; color: var(--gray-800); }
+.td-clear { color: var(--green-mid); font-weight: 600; }
+.td-cloudy { color: var(--yellow); font-weight: 600; }
+
+/* ===== ABOUT PAGE ===== */
+.about-hero {
+  background: linear-gradient(135deg, var(--green-pale) 0%, var(--blue-pale) 100%);
+  border-radius: var(--radius);
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.layer-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--gray-200);
+  display: flex;
+  gap: 1.2rem;
+  align-items: flex-start;
+  transition: var(--transition);
+}
+.layer-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.layer-num {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 1rem;
+  flex-shrink: 0;
+  color: white;
+}
+.layer-num.n1 { background: linear-gradient(135deg, #8b6914, #c49a28); }
+.layer-num.n2 { background: linear-gradient(135deg, #c8a14f, #f0c060); }
+.layer-num.n3 { background: linear-gradient(135deg, #3a5236, #5a7a55); }
+.layer-num.n4 { background: linear-gradient(135deg, #4a7fbd, #7aacde); }
+.layer-card h3 { font-family: var(--font-head); font-weight: 700; color: var(--green-dark); margin-bottom: 0.25rem; }
+.layer-card p { font-size: 0.88rem; color: var(--gray-600); line-height: 1.6; }
+.diagram-placeholder {
+  background: linear-gradient(135deg, var(--gray-100), var(--blue-pale));
+  border: 2px dashed var(--gray-200);
+  border-radius: var(--radius);
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-400);
+  font-size: 0.9rem;
+  margin: 2rem 0;
+  gap: 0.5rem;
+}
+.diagram-placeholder .di { font-size: 2.5rem; }
+
+/* ===== GUIDE PAGE ===== */
+.guide-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border-top: 4px solid;
+  margin-bottom: 1.2rem;
+}
+.guide-card.g1 { border-color: #c49a28; }
+.guide-card.g2 { border-color: #f0c060; }
+.guide-card.g3 { border-color: #5a7a55; }
+.guide-card.g4 { border-color: #7aacde; }
+.guide-card h3 { font-family: var(--font-head); font-weight: 700; color: var(--green-dark); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; }
+.guide-steps { display: flex; flex-direction: column; gap: 0.65rem; }
+.guide-step {
+  display: flex; gap: 0.75rem; align-items: flex-start;
+  font-size: 0.88rem; color: var(--gray-600);
+}
+.guide-step-num {
+  width: 22px; height: 22px;
+  background: var(--green-pale);
+  color: var(--green-dark);
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.interval-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--blue-pale);
+  color: var(--blue-dark);
+  padding: 0.3rem 0.75rem;
+  border-radius: 100px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+/* ===== CONTACT ===== */
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.contact-info-item {
+  display: flex; gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--gray-200);
+}
+.contact-info-item:last-child { border-bottom: none; }
+.contact-icon {
+  width: 40px; height: 40px;
+  background: var(--green-pale);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.contact-info-item .ci-label { font-size: 0.76rem; color: var(--gray-400); margin-bottom: 0.15rem; }
+.contact-info-item .ci-value { font-weight: 600; color: var(--gray-800); font-size: 0.9rem; }
+
+/* ===== FUTURE PAGE ===== */
+.future-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--gray-200);
+  text-align: center;
+}
+.future-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+.future-card h3 { font-family: var(--font-head); font-weight: 700; color: var(--green-dark); margin-bottom: 0.5rem; font-size: 1rem; }
+.future-card p { font-size: 0.85rem; color: var(--gray-600); line-height: 1.6; }
+.future-tag {
+  display: inline-block;
+  background: var(--blue-pale);
+  color: var(--blue-dark);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  margin-top: 0.75rem;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background: var(--green-dark);
+  color: white;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  margin-top: 4rem;
+}
+footer .footer-brand {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+footer p { opacity: 0.65; font-size: 0.85rem; }
+footer .footer-links { display: flex; gap: 1.5rem; justify-content: center; margin: 1rem 0; flex-wrap: wrap; }
+footer .footer-links a { opacity: 0.75; font-size: 0.85rem; transition: var(--transition); }
+footer .footer-links a:hover { opacity: 1; }
+
+/* ===== INFO ROW ===== */
+.info-row { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.8rem; }
+.info-row label { font-size: 0.76rem; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.info-row .value { font-size: 0.95rem; color: var(--gray-800); font-weight: 500; }
+
+/* ===== SMS / CALENDAR BUTTONS ===== */
+.action-row {
+  display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1.5rem;
+}
+
+/* ===== OVERALL HEALTH BIG NUMBER ===== */
+.big-health {
+  text-align: center; padding: 2rem; background: linear-gradient(135deg, var(--green-pale), var(--blue-pale));
+  border-radius: var(--radius); margin-bottom: 1.5rem;
+}
+.big-health .num {
+  font-family: var(--font-head);
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--green-mid);
+  line-height: 1;
+}
+.big-health .lbl { font-size: 0.85rem; color: var(--gray-400); margin-top: 0.3rem; }
+
+/* ===== TOAST ===== */
+#toast {
+  position: fixed; bottom: 2rem; right: 2rem;
+  background: var(--green-dark); color: white;
+  padding: 0.9rem 1.5rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  z-index: 9999;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+  max-width: 320px;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+
+/* ===== STEP INDICATOR ===== */
+.step-bar {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin-bottom: 2rem;
+}
+.step-item {
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+}
+.step-circle {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--gray-200);
+  color: var(--gray-400);
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 1;
+}
+.step-circle.done { background: var(--green-mid); color: white; }
+.step-label { font-size: 0.7rem; color: var(--gray-400); white-space: nowrap; }
+.step-line { flex: 1; height: 2px; background: var(--gray-200); margin: 0; position: relative; top: -12px; }
+.step-line.done { background: var(--green-mid); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+  .form-row { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .hero-stats { gap: 1.5rem; }
+  .action-row { flex-direction: column; }
+}
+@media (max-width: 480px) {
+  .section { padding: 2.5rem 1rem; }
+  .dash-header { padding: 2rem 1rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav>
+  <div class="nav-brand">
+    <span class="drop-icon">💧</span>
+    AQUAIRIE Monitor
+  </div>
+  <div class="nav-links">
+    <a href="#" onclick="showPage('home')">Home</a>
+    <a href="#" onclick="showPage('about')">About</a>
+    <a href="#" onclick="showPage('dashboard')">Dashboard</a>
+    <a href="#" onclick="showPage('log')">Water Log</a>
+    <a href="#" onclick="showPage('guide')">Guide</a>
+    <a href="#" onclick="showPage('contact')">Contact</a>
+    <a href="#" onclick="showPage('future')">Future</a>
+    <a href="#" onclick="showPage('register')" class="nav-cta">Register System</a>
+  </div>
+  <button class="hamburger" onclick="toggleMobile()" aria-label="Menu">☰</button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#" onclick="showPage('home');toggleMobile()">🏠 Home</a>
+  <a href="#" onclick="showPage('about');toggleMobile()">ℹ️ About AQUAIRIE</a>
+  <a href="#" onclick="showPage('dashboard');toggleMobile()">📊 Dashboard</a>
+  <a href="#" onclick="showPage('log');toggleMobile()">📋 Water Log</a>
+  <a href="#" onclick="showPage('guide');toggleMobile()">🔧 Cleaning Guide</a>
+  <a href="#" onclick="showPage('contact');toggleMobile()">📞 Contact</a>
+  <a href="#" onclick="showPage('future');toggleMobile()">🚀 Future</a>
+  <a href="#" onclick="showPage('register');toggleMobile()">✅ Register System</a>
+</div>
+
+<!-- ========== PAGE: HOME ========== -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-badge">🌱 Smart Agriculture Technology</div>
+    <h1>AQUAIRIE <span>Monitor</span></h1>
+    <p class="hero-tagline">"Smart Monitoring for Sustainable Rainwater Filtration"</p>
+    <p class="hero-desc">
+      Rainwater filtration systems require regular maintenance to work effectively. 
+      AQUAIRIE Monitor helps farmers track filter performance, receive timely reminders, 
+      and maintain clean water quality for agricultural use — all in one simple dashboard.
+    </p>
+    <div class="hero-btns">
+      <button class="btn btn-primary" onclick="showPage('register')">
+        ✅ Register Your AQUAIRIE System
+      </button>
+      <button class="btn btn-secondary" onclick="showPage('about')">
+        Learn More →
+      </button>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="num">4</span><span class="lbl">Filter Layers</span></div>
+      <div class="hero-stat"><span class="num">7–90</span><span class="lbl">Day Cycles</span></div>
+      <div class="hero-stat"><span class="num">100%</span><span class="lbl">Rainwater Use</span></div>
+    </div>
+    <div class="hero-waves">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 80" fill="none">
+        <path fill="#f7fbf9" d="M0,40 C240,80 480,0 720,40 C960,80 1200,0 1440,40 L1440,80 L0,80 Z"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section">
+    <div style="text-align:center;margin-bottom:3rem;">
+      <p class="section-subtitle" style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--green-mid);font-weight:600;">How It Works</p>
+      <h2 class="section-title" style="text-align:center;">Four Layers of Clean Water</h2>
+      <div class="divider" style="margin:0.6rem auto 0;"></div>
+    </div>
+    <div class="grid-4">
+      <div class="card" style="text-align:center;border-top:4px solid #c49a28;">
+        <div style="font-size:2rem;margin-bottom:0.6rem;">🪨</div>
+        <h3 style="font-family:var(--font-head);color:var(--green-dark);font-weight:700;margin-bottom:0.4rem;">Gravel</h3>
+        <p style="font-size:0.82rem;color:var(--gray-600);">Removes large debris, leaves & sediments</p>
+        <div style="margin-top:0.8rem;"><span class="badge badge-green">Every 30 days</span></div>
+      </div>
+      <div class="card" style="text-align:center;border-top:4px solid #f0c060;">
+        <div style="font-size:2rem;margin-bottom:0.6rem;">🏖️</div>
+        <h3 style="font-family:var(--font-head);color:var(--green-dark);font-weight:700;margin-bottom:0.4rem;">Sand</h3>
+        <p style="font-size:0.82rem;color:var(--gray-600);">Filters fine suspended particles</p>
+        <div style="margin-top:0.8rem;"><span class="badge badge-green">Every 30 days</span></div>
+      </div>
+      <div class="card" style="text-align:center;border-top:4px solid #5a7a55;">
+        <div style="font-size:2rem;margin-bottom:0.6rem;">🌑</div>
+        <h3 style="font-family:var(--font-head);color:var(--green-dark);font-weight:700;margin-bottom:0.4rem;">Biochar</h3>
+        <p style="font-size:0.82rem;color:var(--gray-600);">Absorbs odors & organic contaminants</p>
+        <div style="margin-top:0.8rem;"><span class="badge badge-yellow">60–90 days</span></div>
+      </div>
+      <div class="card" style="text-align:center;border-top:4px solid #7aacde;">
+        <div style="font-size:2rem;margin-bottom:0.6rem;">🧴</div>
+        <h3 style="font-family:var(--font-head);color:var(--green-dark);font-weight:700;margin-bottom:0.4rem;">Cotton</h3>
+        <p style="font-size:0.82rem;color:var(--gray-600);">Final polish — traps very fine particles</p>
+        <div style="margin-top:0.8rem;"><span class="badge badge-red">Every 7 days</span></div>
+      </div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,var(--green-dark),var(--blue-dark));border-radius:var(--radius);padding:3rem 2rem;text-align:center;margin-top:3rem;color:white;">
+      <h2 style="font-family:var(--font-head);font-size:1.8rem;font-weight:800;margin-bottom:0.75rem;">Ready to Monitor Your System?</h2>
+      <p style="opacity:0.8;margin-bottom:1.5rem;font-size:0.95rem;">Register your AQUAIRIE filtration unit and get real-time maintenance alerts.</p>
+      <button class="btn btn-primary" style="background:white;color:var(--green-dark);" onclick="showPage('register')">
+        ✅ Register Now — It's Free
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: REGISTER ========== -->
+<div class="page" id="page-register">
+  <div class="section">
+    <div style="text-align:center;margin-bottom:2rem;">
+      <h2 class="section-title" style="text-align:center;">Register Your AQUAIRIE System</h2>
+      <div class="divider" style="margin:0.6rem auto 0;"></div>
+      <p class="section-subtitle" style="margin-top:0.8rem;">Enter your details to begin monitoring your filtration system.</p>
+    </div>
+
+    <div class="step-bar">
+      <div class="step-item">
+        <div class="step-circle done">1</div>
+        <span class="step-label">Farm Info</span>
+      </div>
+      <div class="step-line done"></div>
+      <div class="step-item">
+        <div class="step-circle done">2</div>
+        <span class="step-label">System Details</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-circle">3</div>
+        <span class="step-label">Dashboard</span>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h3 style="font-family:var(--font-head);font-weight:700;color:var(--green-dark);margin-bottom:0.25rem;font-size:1.15rem;">🌾 Farm & System Information</h3>
+      <p style="font-size:0.82rem;color:var(--gray-400);margin-bottom:1.5rem;">All fields marked with * are required.</p>
+
+      <div class="form-group">
+        <label>Farmer Name <span class="req">*</span></label>
+        <input type="text" id="reg-name" placeholder="e.g. Juan dela Cruz" />
+      </div>
+      <div class="form-group">
+        <label>Farm Location <span class="req">*</span></label>
+        <input type="text" id="reg-location" placeholder="e.g. Barangay Sta. Cruz, Cebu" />
+      </div>
+      <div class="form-group">
+        <label>Contact Number <span class="req">*</span></label>
+        <input type="tel" id="reg-contact" placeholder="e.g. 09xx xxx xxxx" />
+      </div>
+
+      <hr class="form-divider"/>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Installation Date <span class="req">*</span></label>
+          <input type="date" id="reg-install" />
+          <p class="form-hint">When was your AQUAIRIE unit installed?</p>
+        </div>
+        <div class="form-group">
+          <label>Last Cleaning Date <span class="req">*</span></label>
+          <input type="date" id="reg-lastclean" />
+          <p class="form-hint">Date all filters were last cleaned.</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Farm Type</label>
+        <select id="reg-farmtype">
+          <option value="">Select farm type...</option>
+          <option>Rice / Crop Farm</option>
+          <option>Poultry System</option>
+          <option>Livestock Farm</option>
+          <option>Vegetable Garden</option>
+          <option>Mixed Agriculture</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary form-btn" onclick="registerSystem()">
+        ✅ Register & Go to Dashboard
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: ABOUT ========== -->
+<div class="page" id="page-about">
+  <div class="section">
+    <div class="about-hero">
+      <div style="font-size:3rem;margin-bottom:1rem;">💧</div>
+      <h2 class="section-title" style="text-align:center;">About AQUAIRIE</h2>
+      <p style="color:var(--gray-600);max-width:600px;margin:0.8rem auto 0;font-size:0.95rem;line-height:1.7;">
+        AQUAIRIE is a modular rainwater filtration prototype designed for agricultural use in farms and poultry systems. 
+        It collects and purifies rainwater through four sequential filtration layers, providing clean water for farming needs 
+        while promoting sustainability.
+      </p>
+    </div>
+
+    <h3 style="font-family:var(--font-head);font-weight:700;color:var(--green-dark);font-size:1.3rem;margin-bottom:1.2rem;">🏗️ The Four Filtration Layers</h3>
+
+    <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:2.5rem;">
+      <div class="layer-card">
+        <div class="layer-num n1">1</div>
+        <div>
+          <h3>🪨 Gravel Filter — First Layer</h3>
+          <p>The gravel layer is the first line of defense. It removes large debris such as leaves, twigs, insects, and coarse sediments from the collected rainwater. This prevents clogging of the finer layers below and significantly extends the lifespan of the entire filtration system.</p>
+          <span class="badge badge-yellow" style="margin-top:0.6rem;">Clean every 30 days</span>
+        </div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num n2">2</div>
+        <div>
+          <h3>🏖️ Sand Filter — Second Layer</h3>
+          <p>The sand layer filters out finer suspended particles that passed through the gravel. It improves water clarity and removes smaller sediments, dust, and microscopic particles. The sand layer plays a key role in making the water visibly cleaner before it reaches the biochar stage.</p>
+          <span class="badge badge-yellow" style="margin-top:0.6rem;">Clean every 30 days</span>
+        </div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num n3">3</div>
+        <div>
+          <h3>🌑 Biochar Filter — Third Layer</h3>
+          <p>Biochar is a highly porous, carbon-rich material produced by burning organic matter at high temperatures. In this layer, it absorbs chemical impurities, odors, and organic contaminants from the water. Biochar is particularly effective at removing pesticide residues and improving taste quality.</p>
+          <span class="badge badge-green" style="margin-top:0.6rem;">Replace every 60–90 days</span>
+        </div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num n4">4</div>
+        <div>
+          <h3>🧴 Cotton Filter — Final Layer</h3>
+          <p>The cotton layer is the final polishing stage. It traps very fine particles, dust, and residual sediments before the water exits the system. Cotton is the most frequently replaced filter due to its fine filtration capability and susceptibility to clogging, ensuring the cleanest possible output water.</p>
+          <span class="badge badge-red" style="margin-top:0.6rem;">Clean/replace every 7 days</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="diagram-placeholder">
+      <span class="di">🖼️</span>
+      <strong>AQUAIRIE Filtration Diagram</strong>
+      <span style="font-size:0.8rem;">[ Insert photo or diagram of the prototype here ]</span>
+    </div>
+
+    <div class="grid-2" style="margin-top:2rem;">
+      <div class="card" style="background:var(--green-pale);">
+        <h3 style="font-family:var(--font-head);color:var(--green-dark);font-weight:700;margin-bottom:0.75rem;">🎯 Purpose</h3>
+        <p style="font-size:0.88rem;color:var(--gray-600);line-height:1.7;">
+          AQUAIRIE is designed to help small-scale farmers access clean water from rainwater harvesting. 
+          By filtering collected rainwater, it reduces dependence on commercial water sources and promotes sustainable agriculture.
+        </p>
+      </div>
+      <div class="card" style="background:var(--blue-pale);">
+        <h3 style="font-family:var(--font-head);color:var(--blue-dark);font-weight:700;margin-bottom:0.75rem;">📍 Target Users</h3>
+        <p style="font-size:0.88rem;color:var(--gray-600);line-height:1.7;">
+          Designed for rice farms, vegetable gardens, and poultry systems — especially in rural and semi-urban areas 
+          where access to clean water can be inconsistent. Ideal for small to medium agricultural operations.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: DASHBOARD ========== -->
+<div class="page" id="page-dashboard">
+  <div class="dash-header">
+    <p class="dash-greeting" id="dash-greeting">Welcome back,</p>
+    <h2 id="dash-name">Your Farm Dashboard</h2>
+    <p id="dash-location">AQUAIRIE Filtration Monitor</p>
+  </div>
+
+  <div class="section">
+    <!-- Notifications -->
+    <div id="notifications-area" style="margin-bottom:2rem;"></div>
+
+    <!-- System Overview -->
+    <h3 style="font-family:var(--font-head);color:var(--green-dark);font-weight:700;font-size:1.15rem;margin-bottom:1rem;">📊 System Overview</h3>
+    <div class="grid-4" style="margin-bottom:2rem;">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6rem;margin-bottom:0.4rem;">📅</div>
+        <div style="font-size:0.75rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:0.3rem;">Installed</div>
+        <div id="ov-install" style="font-weight:700;color:var(--green-dark);font-size:0.95rem;">—</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6rem;margin-bottom:0.4rem;">🧹</div>
+        <div style="font-size:0.75rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:0.3rem;">Last Cleaned</div>
+        <div id="ov-lastclean" style="font-weight:700;color:var(--green-dark);font-size:0.95rem;">—</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6rem;margin-bottom:0.4rem;">⏰</div>
+        <div style="font-size:0.75rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:0.3rem;">Next Cleaning</div>
+        <div id="ov-nextclean" style="font-weight:700;color:var(--green-dark);font-size:0.95rem;">—</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:1.6rem;margin-bottom:0.4rem;">📞</div>
+        <div style="font-size:0.75rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:0.3rem;">Contact</div>
+        <div id="ov-contact" style="font-weight:700;color:var(--green-dark);font-size:0.95rem;">—</div>
+      </div>
+    </div>
+
+    <!-- Overall Health -->
+    <div class="big-health" id="overall-health-card">
+      <div class="num" id="overall-pct">—%</div>
+      <div class="lbl">Overall Filter System Health</div>
+      <div class="progress-wrap" style="max-width:400px;margin:1rem auto 0;">
+        <div class="progress-track">
+          <div class="progress-bar" id="overall-bar" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Cards -->
+    <h3 style="font-family:var(--font-head);color:var(--green-dark);font-weight:700;font-size:1.15rem;margin-bottom:1rem;">🔍 Individual Filter Status</h3>
+    <div class="grid-4" id="filter-cards-area"></div>
+
+    <!-- Action Buttons -->
+    <div class="action-row" style="margin-top:2.5rem;">
+      <button class="btn btn-blue" onclick="addToCalendar()">📅 Add Maintenance Reminder to Google Calendar</button>
+      <button class="btn btn-secondary" onclick="sendSMS()">📱 Send Reminder via SMS</button>
+      <button class="btn btn-outline" onclick="showPage('guide')">🔧 View Cleaning Guide</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: WATER LOG ========== -->
+<div class="page" id="page-log">
+  <div class="section">
+    <h2 class="section-title">💧 Water Quality Log</h2>
+    <div class="divider"></div>
+    <p class="section-subtitle">Record observations about your filtered water quality.</p>
+
+    <div class="card" style="margin-bottom:2rem;">
+      <h3 style="font-family:var(--font-head);font-weight:700;color:var(--green-dark);margin-bottom:1.2rem;">➕ Add New Entry</h3>
+      <div class="form-row" style="margin-bottom:1rem;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Date</label>
+          <input type="date" id="log-date" />
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Water Appearance</label>
+          <select id="log-appear">
+            <option value="Clear">Clear</option>
+            <option value="Slightly Cloudy">Slightly Cloudy</option>
+            <option value="Cloudy">Cloudy</option>
+            <option value="Very Cloudy">Very Cloudy</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:1rem;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Turbidity Observation</label>
+          <select id="log-turb">
+            <option value="Low — Very Clear">Low — Very Clear</option>
+            <option value="Moderate — Slightly Hazy">Moderate — Slightly Hazy</option>
+            <option value="High — Visibly Turbid">High — Visibly Turbid</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Notes</label>
+          <input type="text" id="log-notes" placeholder="Optional observations..." />
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addLogEntry()">+ Add Entry</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Appearance</th>
+            <th>Turbidity</th>
+            <th>Notes</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="log-tbody">
+          <tr id="log-empty-row">
+            <td colspan="5" style="text-align:center;color:var(--gray-400);padding:2rem;">No entries yet. Add your first water quality record above.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: GUIDE ========== -->
+<div class="page" id="page-guide">
+  <div class="section">
+    <h2 class="section-title">🔧 Cleaning & Maintenance Guide</h2>
+    <div class="divider"></div>
+    <p class="section-subtitle">Follow these instructions to properly maintain each filter layer of your AQUAIRIE system.</p>
+
+    <div class="guide-card g1">
+      <h3>🪨 Gravel Filter</h3>
+      <div class="guide-steps">
+        <div class="guide-step"><div class="guide-step-num">1</div><span>Remove the gravel layer carefully from the filtration housing unit.</span></div>
+        <div class="guide-step"><div class="guide-step-num">2</div><span>Rinse the gravel under running water to remove large debris, soil, and sediment buildup.</span></div>
+        <div class="guide-step"><div class="guide-step-num">3</div><span>Scrub gravel gently if algae or organic growth is present.</span></div>
+        <div class="guide-step"><div class="guide-step-num">4</div><span>Spread out in sunlight for 30 minutes to dry and disinfect naturally.</span></div>
+        <div class="guide-step"><div class="guide-step-num">5</div><span>Return gravel to the housing, ensuring even distribution across the layer.</span></div>
+      </div>
+      <div class="interval-tag">🗓️ Recommended: Every 30 days (1 month)</div>
+    </div>
+
+    <div class="guide-card g2">
+      <h3>🏖️ Sand Filter</h3>
+      <div class="guide-steps">
+        <div class="guide-step"><div class="guide-step-num">1</div><span>Remove sand carefully using a scoop; place in a clean container or bucket.</span></div>
+        <div class="guide-step"><div class="guide-step-num">2</div><span>Rinse sand with clean water multiple times until wash water runs clear.</span></div>
+        <div class="guide-step"><div class="guide-step-num">3</div><span>Check sand for discoloration or strong odor — replace entirely if necessary.</span></div>
+        <div class="guide-step"><div class="guide-step-num">4</div><span>Let the sand dry completely before returning to filtration unit.</span></div>
+        <div class="guide-step"><div class="guide-step-num">5</div><span>Repack sand evenly, ensuring no large gaps or air pockets exist in the layer.</span></div>
+      </div>
+      <div class="interval-tag">🗓️ Recommended: Every 30 days (1 month)</div>
+    </div>
+
+    <div class="guide-card g3">
+      <h3>🌑 Biochar Filter</h3>
+      <div class="guide-steps">
+        <div class="guide-step"><div class="guide-step-num">1</div><span>Remove the biochar layer from the housing. Biochar cannot be washed — it must be replaced.</span></div>
+        <div class="guide-step"><div class="guide-step-num">2</div><span>Dispose of old biochar responsibly (can be added to garden soil as a soil amendment).</span></div>
+        <div class="guide-step"><div class="guide-step-num">3</div><span>Clean the housing section that held the biochar with water.</span></div>
+        <div class="guide-step"><div class="guide-step-num">4</div><span>Prepare fresh biochar material — ensure it is food-grade or agricultural-grade biochar.</span></div>
+        <div class="guide-step"><div class="guide-step-num">5</div><span>Pack the new biochar evenly into the layer compartment and seal the housing.</span></div>
+      </div>
+      <div class="interval-tag">🗓️ Recommended: Every 60–90 days (replace, do not wash)</div>
+    </div>
+
+    <div class="guide-card g4">
+      <h3>🧴 Cotton Filter</h3>
+      <div class="guide-steps">
+        <div class="guide-step"><div class="guide-step-num">1</div><span>Remove the cotton filter element from its housing at the bottom of the system.</span></div>
+        <div class="guide-step"><div class="guide-step-num">2</div><span>If lightly soiled, rinse gently with clean water and squeeze out gently (do not twist).</span></div>
+        <div class="guide-step"><div class="guide-step-num">3</div><span>If heavily soiled, discolored, or degraded, replace with new clean cotton material.</span></div>
+        <div class="guide-step"><div class="guide-step-num">4</div><span>Allow cotton to air dry if reusing before reinstalling into the unit.</span></div>
+        <div class="guide-step"><div class="guide-step-num">5</div><span>Reinstall carefully, ensuring the cotton covers the full output area to prevent bypassing.</span></div>
+      </div>
+      <div class="interval-tag">🗓️ Recommended: Every 7 days (most frequent — weekly)</div>
+    </div>
+
+    <div class="card" style="background:var(--blue-pale);border:1px solid var(--blue-light);margin-top:2rem;">
+      <h3 style="font-family:var(--font-head);color:var(--blue-dark);font-weight:700;margin-bottom:0.8rem;">💡 General Maintenance Tips</h3>
+      <ul style="display:flex;flex-direction:column;gap:0.5rem;list-style:none;">
+        <li style="font-size:0.88rem;color:var(--gray-600);display:flex;gap:0.6rem;"><span>✅</span><span>Always use clean hands or gloves when handling filter materials.</span></li>
+        <li style="font-size:0.88rem;color:var(--gray-600);display:flex;gap:0.6rem;"><span>✅</span><span>Log your cleaning dates in the Water Quality Log after each maintenance.</span></li>
+        <li style="font-size:0.88rem;color:var(--gray-600);display:flex;gap:0.6rem;"><span>✅</span><span>Inspect all housing connections for cracks or leaks during each cleaning.</span></li>
+        <li style="font-size:0.88rem;color:var(--gray-600);display:flex;gap:0.6rem;"><span>✅</span><span>If water output reduces significantly, check cotton first — it clogs fastest.</span></li>
+        <li style="font-size:0.88rem;color:var(--gray-600);display:flex;gap:0.6rem;"><span>✅</span><span>Do not use chemical cleaners on filter materials unless specified.</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: CONTACT ========== -->
+<div class="page" id="page-contact">
+  <div class="section">
+    <h2 class="section-title">📞 Contact & Support</h2>
+    <div class="divider"></div>
+    <p class="section-subtitle">Need help with your AQUAIRIE system? Reach out to our agricultural support team.</p>
+
+    <div class="contact-grid">
+      <div>
+        <div class="card" style="margin-bottom:1.2rem;">
+          <h3 style="font-family:var(--font-head);font-weight:700;color:var(--green-dark);margin-bottom:1rem;">📍 Contact Information</h3>
+          <div class="contact-info-item">
+            <div class="contact-icon">🏢</div>
+            <div>
+              <div class="ci-label">Organization</div>
+              <div class="ci-value">AQUAIRIE Agricultural Solutions</div>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-icon">📍</div>
+            <div>
+              <div class="ci-label">Address</div>
+              <div class="ci-value">Cebu City, Central Visayas, Philippines</div>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-icon">📧</div>
+            <div>
+              <div class="ci-label">Email</div>
+              <div class="ci-value">support@aquairie.ph</div>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-icon">📞</div>
+            <div>
+              <div class="ci-label">Phone / Hotline</div>
+              <div class="ci-value">+63 (032) 555-1234</div>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-icon">🕐</div>
+            <div>
+              <div class="ci-label">Support Hours</div>
+              <div class="ci-value">Mon–Sat, 8:00 AM – 5:00 PM PHT</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="background:var(--green-pale);">
+          <h3 style="font-family:var(--font-head);font-weight:700;color:var(--green-dark);margin-bottom:0.6rem;">🌱 Agricultural Expert Network</h3>
+          <p style="font-size:0.85rem;color:var(--gray-600);line-height:1.7;">
+            We partner with local agricultural technicians (ATs) and the Department of Agriculture (DA) 
+            Regional Field Office VII to provide on-site assistance to registered farmers.
+          </p>
+          <button class="btn btn-primary btn-sm" style="margin-top:1rem;" onclick="showToast('Expert request sent! We will contact you within 48 hours.')">Request On-Site Expert Visit</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h3 style="font-family:var(--font-head);font-weight:700;color:var(--green-dark);margin-bottom:1.2rem;">✉️ Send Us a Message</h3>
+          <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" placeholder="Full name" />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" placeholder="youremail@example.com" />
+          </div>
+          <div class="form-group">
+            <label>Subject</label>
+            <select>
+              <option>General Inquiry</option>
+              <option>Maintenance Help</option>
+              <option>Request Expert Visit</option>
+              <option>Technical Issue</option>
+              <option>Partnership / Collaboration</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea rows="5" placeholder="Describe your concern or question..."></textarea>
+          </div>
+          <button class="btn btn-primary" style="width:100%;" onclick="showToast('Message sent! We\'ll get back to you within 1–2 business days.')">Send Message 📤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: FUTURE ========== -->
+<div class="page" id="page-future">
+  <div class="section">
+    <div style="text-align:center;margin-bottom:3rem;">
+      <p style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--blue-mid);font-weight:600;margin-bottom:0.5rem;">What's Coming Next</p>
+      <h2 class="section-title" style="text-align:center;">🚀 Future Improvements</h2>
+      <div class="divider" style="margin:0.6rem auto;"></div>
+      <p style="color:var(--gray-600);max-width:580px;margin:0 auto;font-size:0.9rem;line-height:1.7;">
+        AQUAIRIE is a growing platform. Here are the planned upgrades that will make monitoring smarter, 
+        more automated, and more accessible for Filipino farmers.
+      </p>
+    </div>
+
+    <div class="grid-3">
+      <div class="future-card">
+        <div class="future-icon">📡</div>
+        <h3>Turbidity Sensors</h3>
+        <p>IoT-enabled turbidity sensors installed directly in the filtration housing will automatically measure water clarity in real time, removing the need for manual visual observation.</p>
+        <span class="future-tag">Hardware Integration</span>
+      </div>
+      <div class="future-card">
+        <div class="future-icon">🧪</div>
+        <h3>pH Monitoring</h3>
+        <p>Digital pH probes will continuously monitor water acidity, alerting farmers when water pH falls outside safe ranges for agricultural use or livestock consumption.</p>
+        <span class="future-tag">Water Quality</span>
+      </div>
+      <div class="future-card">
+        <div class="future-icon">📲</div>
+        <h3>Automatic SMS Alerts</h3>
+        <p>Integration with the Philippine SMS gateway (e.g., Semaphore or Globe Labs API) will enable automatic text message alerts sent directly to the farmer's registered phone number.</p>
+        <span class="future-tag">Communication</span>
+      </div>
+      <div class="future-card">
+        <div class="future-icon">📱</div>
+        <h3>Mobile App</h3>
+        <p>A dedicated Android and iOS mobile application will allow farmers to view their dashboard, receive push notifications, and log water quality readings from their smartphone.</p>
+        <span class="future-tag">Mobile</span>
+      </div>
+      <div class="future-card">
+        <div class="future-icon">☁️</div>
+        <h3>Cloud Database</h3>
+        <p>All farm data, water logs, and maintenance records will be stored securely in the cloud — accessible anytime, backed up automatically, and shareable with extension workers.</p>
+        <span class="future-tag">Infrastructure</span>
+      </div>
+      <div class="future-card">
+        <div class="future-icon">🤖</div>
+        <h3>AI Maintenance Prediction</h3>
+        <p>Machine learning models trained on filter usage patterns will predict when each layer needs cleaning before health drops — enabling proactive rather than reactive maintenance.</p>
+        <span class="future-tag">Artificial Intelligence</span>
+      </div>
+      <div class="future-card">
+        <div class="future-icon">🗺️</div>
+        <h3>Farm Network Map</h3>
+        <p>A geographic map showing all registered AQUAIRIE units in the region, enabling the DA and NGOs to identify areas with water quality issues and deploy support efficiently.</p>
+        <span class="future-tag">Community</span>
+      </div>
+      <div class="future-card">
+        <div class="future-icon">🔋</div>
+        <h3>Solar-Powered Sensors</h3>
+        <p>Solar-charged battery systems will power embedded sensors in the unit, ensuring 24/7 monitoring capability even in off-grid rural areas without reliable electricity.</p>
+        <span class="future-tag">Energy</span>
+      </div>
+      <div class="future-card">
+        <div class="future-icon">📊</div>
+        <h3>Analytics Dashboard</h3>
+        <p>Advanced multi-farm analytics for extension officers and researchers, showing aggregated water quality trends, filter performance statistics, and maintenance compliance rates.</p>
+        <span class="future-tag">Analytics</span>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:3rem;padding:2.5rem;background:linear-gradient(135deg,var(--green-dark),var(--blue-dark));border-radius:var(--radius);color:white;">
+      <h3 style="font-family:var(--font-head);font-size:1.4rem;font-weight:800;margin-bottom:0.6rem;">Help Shape the Future of AQUAIRIE</h3>
+      <p style="opacity:0.8;font-size:0.9rem;margin-bottom:1.3rem;">Your feedback as a farmer is the most valuable input we can receive.</p>
+      <button class="btn" style="background:white;color:var(--green-dark);font-weight:700;" onclick="showToast('Thank you for your interest! We\'ll be in touch soon.')">🌱 Join Our Pilot Program</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div id="toast"></div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-brand">💧 AQUAIRIE Monitor</div>
+  <p>"Smart Monitoring for Sustainable Rainwater Filtration"</p>
+  <div class="footer-links">
+    <a href="#" onclick="showPage('home')">Home</a>
+    <a href="#" onclick="showPage('about')">About</a>
+    <a href="#" onclick="showPage('dashboard')">Dashboard</a>
+    <a href="#" onclick="showPage('guide')">Cleaning Guide</a>
+    <a href="#" onclick="showPage('contact')">Contact</a>
+    <a href="#" onclick="showPage('future')">Future</a>
+  </div>
+  <p style="font-size:0.78rem;margin-top:0.5rem;">© 2025 AQUAIRIE Monitor. Designed for Philippine Agriculture. 🇵🇭</p>
+</footer>
+
+<script>
+// ===== STATE =====
+let farmData = JSON.parse(localStorage.getItem('aquairie_farm') || 'null');
+let waterLog = JSON.parse(localStorage.getItem('aquairie_log') || '[]');
+
+// Filter intervals in days
+const FILTER_INTERVALS = {
+  gravel: 30, sand: 30, biochar: 75, cotton: 7
+};
+const FILTER_INFO = {
+  gravel: { name: 'Gravel Filter', icon: '🪨', iconClass: 'icon-gravel', sub: 'Debris & large sediment removal' },
+  sand:   { name: 'Sand Filter',   icon: '🏖️', iconClass: 'icon-sand',   sub: 'Fine particle filtration' },
+  biochar:{ name: 'Biochar Filter',icon: '🌑', iconClass: 'icon-biochar', sub: 'Odor & organic contaminant absorption' },
+  cotton: { name: 'Cotton Filter', icon: '🧴', iconClass: 'icon-cotton',  sub: 'Final polishing layer' }
+};
+
+// ===== NAVIGATION =====
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) { pg.classList.add('active'); window.scrollTo(0,0); }
+
+  // Highlight nav
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  if (id === 'dashboard') loadDashboard();
+  if (id === 'log') renderLog();
+}
+
+function toggleMobile() {
+  const m = document.getElementById('mobileMenu');
+  m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+}
+
+// ===== REGISTRATION =====
+function registerSystem() {
+  const name = document.getElementById('reg-name').value.trim();
+  const location = document.getElementById('reg-location').value.trim();
+  const contact = document.getElementById('reg-contact').value.trim();
+  const install = document.getElementById('reg-install').value;
+  const lastclean = document.getElementById('reg-lastclean').value;
+  const farmtype = document.getElementById('reg-farmtype').value;
+
+  if (!name || !location || !contact || !install || !lastclean) {
+    showToast('⚠️ Please fill in all required fields.'); return;
+  }
+
+  farmData = { name, location, contact, install, lastclean, farmtype, registeredAt: new Date().toISOString() };
+  localStorage.setItem('aquairie_farm', JSON.stringify(farmData));
+  showPage('dashboard');
+  showToast('✅ System registered successfully! Welcome, ' + name + '!');
+}
+
+// ===== DATE UTILITIES =====
+function addDays(dateStr, days) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+function daysBetween(d1, d2) {
+  return Math.round((d2 - d1) / (1000*60*60*24));
+}
+function formatDate(d) {
+  return d.toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
+}
+function formatDateShort(d) {
+  return d.toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' });
+}
+
+// ===== FILTER HEALTH CALCULATION =====
+function calcFilterHealth(lastCleanStr, intervalDays) {
+  const lastClean = new Date(lastCleanStr);
+  const today = new Date();
+  const nextClean = addDays(lastCleanStr, intervalDays);
+  const daysSince = daysBetween(lastClean, today);
+  const daysLeft = daysBetween(today, nextClean);
+  let health = Math.max(0, Math.round(((intervalDays - daysSince) / intervalDays) * 100));
+  health = Math.min(100, health);
+  return { health, daysLeft, nextClean, daysSince };
+}
+
+function healthColor(health) {
+  if (health >= 60) return 'green';
+  if (health >= 30) return 'yellow';
+  return 'red';
+}
+function healthBadgeClass(health) {
+  if (health >= 60) return 'badge-green';
+  if (health >= 30) return 'badge-yellow';
+  return 'badge-red';
+}
+function healthStatusLabel(health) {
+  if (health >= 60) return '✅ Good';
+  if (health >= 30) return '⚠️ Maintenance Soon';
+  return '🔴 Needs Cleaning';
+}
+
+// ===== LOAD DASHBOARD =====
+function loadDashboard() {
+  if (!farmData) {
+    document.getElementById('dash-name').textContent = 'No System Registered';
+    document.getElementById('dash-location').textContent = 'Please register your AQUAIRIE system first.';
+    document.getElementById('notifications-area').innerHTML = `
+      <div class="notif notif-yellow">
+        <div class="notif-icon">⚠️</div>
+        <div class="notif-body">
+          <strong>No System Registered</strong>
+          You haven't registered your AQUAIRIE system yet. <a href="#" onclick="showPage('register')" style="text-decoration:underline;">Register now →</a>
+        </div>
+      </div>`;
+    document.getElementById('filter-cards-area').innerHTML = '';
+    document.getElementById('overall-pct').textContent = '—';
+    return;
+  }
+
+  // Header
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dash-greeting').textContent = greeting + ',';
+  document.getElementById('dash-name').textContent = farmData.name + '\'s Farm';
+  document.getElementById('dash-location').textContent = '📍 ' + farmData.location + (farmData.farmtype ? ' — ' + farmData.farmtype : '');
+
+  // Overview
+  document.getElementById('ov-install').textContent = formatDateShort(new Date(farmData.install));
+  document.getElementById('ov-lastclean').textContent = formatDateShort(new Date(farmData.lastclean));
+  document.getElementById('ov-contact').textContent = farmData.contact;
+
+  // Calculate filters
+  const filters = {};
+  let totalHealth = 0;
+  let earliestNext = null;
+  const keys = ['gravel','sand','biochar','cotton'];
+  keys.forEach(k => {
+    const calc = calcFilterHealth(farmData.lastclean, FILTER_INTERVALS[k]);
+    filters[k] = calc;
+    totalHealth += calc.health;
+    if (!earliestNext || calc.nextClean < earliestNext) earliestNext = calc.nextClean;
+  });
+  const overallHealth = Math.round(totalHealth / 4);
+
+  document.getElementById('ov-nextclean').textContent = earliestNext ? formatDateShort(earliestNext) : '—';
+
+  // Overall health bar
+  document.getElementById('overall-pct').textContent = overallHealth + '%';
+  const bar = document.getElementById('overall-bar');
+  bar.style.width = overallHealth + '%';
+  bar.className = 'progress-bar bar-' + healthColor(overallHealth);
+
+  // Filter cards
+  const area = document.getElementById('filter-cards-area');
+  area.innerHTML = '';
+  keys.forEach(k => {
+    const info = FILTER_INFO[k];
+    const calc = filters[k];
+    const color = healthColor(calc.health);
+    const badge = healthBadgeClass(calc.health);
+    const status = healthStatusLabel(calc.health);
+    area.innerHTML += `
+      <div class="filter-card">
+        <div class="filter-icon ${info.iconClass}">${info.icon}</div>
+        <h3>${info.name}</h3>
+        <div class="filter-sub">${info.sub}</div>
+        <span class="badge ${badge}" style="margin-bottom:0.8rem;">${status}</span>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>Health</span><span>${calc.health}%</span></div>
+          <div class="progress-track"><div class="progress-bar bar-${color}" style="width:${calc.health}%"></div></div>
+        </div>
+        <div class="filter-meta">
+          <div class="filter-meta-row"><span>Next Cleaning</span><span>${formatDateShort(calc.nextClean)}</span></div>
+          <div class="filter-meta-row"><span>Days Left</span><span>${calc.daysLeft > 0 ? calc.daysLeft + ' days' : '⚠️ Overdue'}</span></div>
+          <div class="filter-meta-row"><span>Interval</span><span>Every ${FILTER_INTERVALS[k]} days</span></div>
+        </div>
+      </div>`;
+  });
+
+  // Notifications
+  buildNotifications(filters);
+}
+
+function buildNotifications(filters) {
+  const area = document.getElementById('notifications-area');
+  area.innerHTML = '';
+  const keys = ['cotton','gravel','sand','biochar'];
+  let any = false;
+  keys.forEach(k => {
+    const calc = filters[k];
+    const info = FILTER_INFO[k];
+    if (calc.daysLeft < 0) {
+      area.innerHTML += `<div class="notif notif-red"><div class="notif-icon">🔴</div><div class="notif-body"><strong>Overdue: ${info.name}</strong>Your ${info.name.toLowerCase()} is overdue for cleaning by ${Math.abs(calc.daysLeft)} day(s). Please clean immediately!</div></div>`;
+      any = true;
+    } else if (calc.daysLeft <= 5) {
+      area.innerHTML += `<div class="notif notif-yellow"><div class="notif-icon">⚠️</div><div class="notif-body"><strong>Reminder: ${info.name}</strong>Your ${info.name.toLowerCase()} needs cleaning in <strong>${calc.daysLeft} day(s)</strong> (${formatDateShort(calc.nextClean)}).</div></div>`;
+      any = true;
+    }
+  });
+  if (!any) {
+    area.innerHTML = `<div class="notif notif-green"><div class="notif-icon">✅</div><div class="notif-body"><strong>All Filters in Good Condition</strong>No maintenance required in the next 5 days. Keep up the great work!</div></div>`;
+  }
+}
+
+// ===== CALENDAR =====
+function addToCalendar() {
+  if (!farmData) { showToast('Please register your system first.'); return; }
+  const calc = calcFilterHealth(farmData.lastclean, 7); // cotton is most frequent
+  const d = calc.nextClean;
+  const pad = n => String(n).padStart(2,'0');
+  const dateStr = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+  const title = encodeURIComponent('AQUAIRIE Filter Maintenance — ' + farmData.name);
+  const details = encodeURIComponent('Time to clean your AQUAIRIE filtration system filters. Check the AQUAIRIE Monitor dashboard for details.');
+  const location = encodeURIComponent(farmData.location);
+  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateStr}/${dateStr}&details=${details}&location=${location}`;
+  window.open(url, '_blank');
+  showToast('📅 Opening Google Calendar...');
+}
+
+// ===== SMS =====
+function sendSMS() {
+  if (!farmData) { showToast('Please register your system first.'); return; }
+  const calc = calcFilterHealth(farmData.lastclean, 7);
+  const msg = encodeURIComponent(
+    `AQUAIRIE Monitor Reminder: ${farmData.name}, your cotton filter needs cleaning on ${formatDateShort(calc.nextClean)}. Please also check gravel, sand, and biochar filters. Visit your AQUAIRIE dashboard for details.`
+  );
+  const phone = farmData.contact.replace(/\D/g, '');
+  window.location.href = `sms:${phone}?body=${msg}`;
+  showToast('📱 Opening messaging app...');
+}
+
+// ===== WATER LOG =====
+function addLogEntry() {
+  const date = document.getElementById('log-date').value;
+  const appear = document.getElementById('log-appear').value;
+  const turb = document.getElementById('log-turb').value;
+  const notes = document.getElementById('log-notes').value;
+
+  if (!date) { showToast('⚠️ Please select a date for the entry.'); return; }
+
+  waterLog.unshift({ id: Date.now(), date, appear, turb, notes });
+  localStorage.setItem('aquairie_log', JSON.stringify(waterLog));
+  document.getElementById('log-date').value = '';
+  document.getElementById('log-notes').value = '';
+  renderLog();
+  showToast('✅ Water quality entry added!');
+}
+
+function renderLog() {
+  const tbody = document.getElementById('log-tbody');
+  if (waterLog.length === 0) {
+    tbody.innerHTML = '<tr id="log-empty-row"><td colspan="5" style="text-align:center;color:var(--gray-400);padding:2rem;">No entries yet. Add your first water quality record above.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = waterLog.map((e,i) => `
+    <tr>
+      <td>${formatDateShort(new Date(e.date))}</td>
+      <td class="${e.appear === 'Clear' ? 'td-clear' : 'td-cloudy'}">${e.appear}</td>
+      <td>${e.turb}</td>
+      <td>${e.notes || '—'}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="deleteLog(${i})">🗑️ Delete</button></td>
+    </tr>`).join('');
+}
+
+function deleteLog(i) {
+  waterLog.splice(i, 1);
+  localStorage.setItem('aquairie_log', JSON.stringify(waterLog));
+  renderLog();
+  showToast('Entry deleted.');
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ===== INIT =====
+(function init() {
+  // Set today's date as default for log
+  const logDate = document.getElementById('log-date');
+  if (logDate) logDate.value = new Date().toISOString().split('T')[0];
+
+  // Pre-fill registration with today's date if no data
+  const regInstall = document.getElementById('reg-install');
+  const regLastClean = document.getElementById('reg-lastclean');
+  const today = new Date().toISOString().split('T')[0];
+  if (regInstall && !farmData) regInstall.value = today;
+  if (regLastClean && !farmData) regLastClean.value = today;
+
+  // Load dashboard data if registered
+  if (farmData) {
+    document.getElementById('reg-name').value = farmData.name;
+    document.getElementById('reg-location').value = farmData.location;
+    document.getElementById('reg-contact').value = farmData.contact;
+    document.getElementById('reg-install').value = farmData.install;
+    document.getElementById('reg-lastclean').value = farmData.lastclean;
+    if (farmData.farmtype) document.getElementById('reg-farmtype').value = farmData.farmtype;
+  }
+
+  renderLog();
+})();
+</script>
+</body>
+</html>
